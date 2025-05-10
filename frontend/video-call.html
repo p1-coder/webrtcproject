@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Call with Live Subtitles</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Video Call with Live Subtitles</h1>
+    <div id="notification" class="notification"></div>
+    <div class="video-container">
+      <div class="video-box">
+        <h3 id="localLabel" class="video-label">Local Video (You)</h3>
+        <video id="localVideo" autoplay playsinline muted class="video-stream"></video>
+      </div>
+      <div class="video-box">
+        <h3 id="remoteLabel" class="video-label">Remote Video</h3>
+        <video id="remoteVideo" autoplay playsinline class="video-stream"></video>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="muteButton" class="btn btn-secondary"><i class="icon">🔊</i> Mute</button>
+      <button id="videoButton" class="btn btn-secondary"><i class="icon">📹</i> Video Off</button>
+      <button id="hangupButton" class="btn btn-danger"><i class="icon">📞</i> Hang Up</button>
+      <button id="saveTranscription" class="btn btn-primary"><i class="icon">💾</i> Save Subtitles</button>
+    </div>
+    <div class="transcription-container">
+      <h2>Live Subtitles</h2>
+      <div id="transcription" class="transcription-box"></div>
+    </div>
+  </div>
+  <script src="video-call.js"></script>
+</body>
+</html>
