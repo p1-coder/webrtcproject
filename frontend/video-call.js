@@ -1,4 +1,6 @@
-const socket = io('http://192.168.1.4:5000'); // Replace with your laptop's IP
+const socket = io(`http://${window.location.hostname}:5000`, {
+  transports: ['websocket', 'polling']
+});// Replace with your laptop's IP
 const urlParams = new URLSearchParams(window.location.search);
 const roomId = urlParams.get('roomId') || 'default-room';
 const userId = urlParams.get('userId') || `User_${Math.random().toString(36).substring(7)}`;
@@ -8,6 +10,8 @@ let transcriptions = [];
 let isMuted = false;
 let isVideoOn = true;
 let recognition = null;
+let recognitionError = false;
+let restartTimeout = null;
 
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
@@ -174,17 +178,30 @@ function startTranscription() {
     updateTranscriptionDisplay(interim);
   };
 
-  recognition.onerror = event => {
+
+  recognition.onerror = (event) => {
     console.error('Speech recognition error:', event.error);
     showNotification(`Subtitles error: ${event.error}`, 'error');
+    recognitionError = true;
   };
 
   recognition.onend = () => {
-    console.log('Speech recognition ended, restarting...');
-    try {
-      recognition.start();
-    } catch (error) {
-      console.error('Error restarting recognition:', error);
+    if (!recognitionError) {
+      console.log("Speech recognition ended, scheduling restart...");
+      if (restartTimeout) clearTimeout(restartTimeout);
+
+      // Delay restart to prevent infinite rapid loops
+      restartTimeout = setTimeout(() => {
+        try {
+          recognition.start();
+          console.log('Speech recognition restarted');
+        } catch (error) {
+          console.error('Error restarting recognition:', error);
+          showNotification('Failed to restart subtitles', 'error');
+        }
+      }, 1000); // 1-second delay to avoid rapid restart loops
+    } else {
+      console.log("Speech recognition aborted due to error");
     }
   };
 
